@@ -5,7 +5,7 @@ unit Arch;
 interface
 
 uses
-  Classes, SysUtils, PasZLib;
+  Classes, SysUtils, PasZLib, FileUtil;
 
 const
   C_STRING_BUFFER_LEN = 1024;
@@ -57,6 +57,7 @@ type
     m_DirInfoTable: TArchDirInfoTable;
     m_FileAndDir: TCardinalArray;
     m_CallbackFunc: TArchExtractorCallback;
+    m_nCreatedDirs: Cardinal;
     procedure ReadHeader;
     procedure ReadNameTable;
     procedure ReadFileInfoTable;
@@ -127,18 +128,29 @@ begin
   for i := 0 to m_Header.dwDirCount - 1 do
   begin
     szDir := PChar(m_Nametable) + m_DirInfoTable[i].dwFilenameOffset;
-    CreateDir(strRootDir + '\' + szDir);
+    if CreateDir(strRootDir + '\' + szDir) then
+      Inc(m_nCreatedDirs, 1);
   end;
 end;
 
 procedure TArchExtractor.ExtractFiles;
 var strRootDir: string;
+    slDirs, slFiles: TStringList;
 begin
   strRootDir := ExtractFileName(m_Stream.FileName) + '_RootFolder';
+  m_nCreatedDirs := 0;
 
   FillFileAndDir;
   CreateDirStructure(strRootDir);
   ExtractFiles(strRootDir);
+
+  m_CallbackFunc('');
+
+  slDirs := FindAllDirectories(strRootDir);
+  slFiles := FindAllFiles(strRootDir);
+
+  m_CallbackFunc(Format('Directories: %d out of %d', [slDirs.Count + 1, m_Header.dwDirCount]));
+  m_CallbackFunc(Format('Files: %d out of %d', [slFiles.Count, m_Header.dwFileCount]));
 end;
 
 procedure TArchExtractor.ExtractFiles(strRootDir: string);
