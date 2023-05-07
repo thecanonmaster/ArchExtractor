@@ -43,7 +43,7 @@ begin
     WriteLn('Arch Extractor', APP_VERSION);
     WriteLn('Usage: ArchExtractor.exe -f InputFile.Arch01');
     WriteLn('Options:');
-    WriteLn('   -f: Input Arch01 file (Arch00 probably works too)');
+    WriteLn('   -f: Input Arch00-01 file');
   end
   else
   begin

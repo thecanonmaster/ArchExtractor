@@ -151,6 +151,9 @@ begin
 
   m_CallbackFunc(Format('Directories: %d out of %d', [slDirs.Count + 1, m_Header.dwDirCount]));
   m_CallbackFunc(Format('Files: %d out of %d', [slFiles.Count, m_Header.dwFileCount]));
+
+  slDirs.Free;
+  slFiles.Free;
 end;
 
 procedure TArchExtractor.ExtractFiles(strRootDir: string);
